@@ -407,7 +407,7 @@ public class ScaleGestureDetector {
         if (inDoubleTapMode()) {
             span = spanY;
         } else {
-            span = FloatMath.sqrt(spanX * spanX + spanY * spanY);
+            span = (float) Math.sqrt(spanX * spanX + spanY * spanY);
         }
 
         // Dispatch begin/end events as needed.
