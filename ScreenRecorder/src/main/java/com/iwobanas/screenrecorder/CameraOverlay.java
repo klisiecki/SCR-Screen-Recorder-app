@@ -1,10 +1,6 @@
 package com.iwobanas.screenrecorder;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
@@ -12,22 +8,22 @@ import android.hardware.Camera;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Surface;
-import android.view.TextureView;
-import android.view.View;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import com.iwobanas.screenrecorder.settings.CameraNumber;
 import com.iwobanas.screenrecorder.settings.Settings;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 @SuppressWarnings("deprecation")
 public class CameraOverlay extends AbstractScreenOverlay implements TextureView.SurfaceTextureListener, SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final Settings settings = Settings.getInstance();
+
     private static final String TAG = "scr_FaceOverlay";
     private static final String FACE_OVERLAY = "FACE_OVERLAY";
     private static final String FACE_OVERLAY_WIDTH = "FACE_OVERLAY_WIDTH";
@@ -39,6 +35,7 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
     int minScreenPortion = 8; // 1/8 of the longer edge of the screen
     private WindowManager.LayoutParams layoutParams;
     private Camera camera;
+    private CameraNumber cameraNumber = settings.getCameraNumber();
     private int cameraOrientation;
     private View rootView;
     private TextureView textureView;
@@ -249,11 +246,20 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
     private void updateCameraRotation() {
         if (camera == null) return;
         int degrees = 0;
-        switch (displayRotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+        if (cameraNumber == CameraNumber.FRONT) {
+            switch (displayRotation) {
+                case Surface.ROTATION_0: degrees = 0; break;
+                case Surface.ROTATION_90: degrees = 90; break;
+                case Surface.ROTATION_180: degrees = 180; break;
+                case Surface.ROTATION_270:  degrees = 270; break;
+            }
+        } else {
+            switch (displayRotation) {
+                case Surface.ROTATION_0: degrees = 180; break;
+                case Surface.ROTATION_90: degrees = 270; break;
+                case Surface.ROTATION_180: degrees = 0; break;
+                case Surface.ROTATION_270:  degrees = 90; break;
+            }
         }
 
         degrees = (cameraOrientation + degrees) % 360;
@@ -264,7 +270,10 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
     @Override
     public void show() {
         initializeSize();
-        if (!isVisible()) {
+        if (!isVisible() || cameraChanged()) {
+            if (cameraChanged()) {
+                doReleaseCamera();
+            }
             getContext().registerReceiver(configChangeReceiver, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
             displayRotation = getDefaultDisplay().getRotation();
 
@@ -275,6 +284,10 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
         if (textureView != null) {
             textureView.setAlpha(Settings.getInstance().getCameraAlpha());
         }
+    }
+
+    private boolean cameraChanged() {
+        return cameraNumber != settings.getCameraNumber();
     }
 
     private void openCamera() {
@@ -290,17 +303,18 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
         openingCamera = true;
 
         Log.v(TAG, "Opening camera");
-        final int frontFacingCamera = getFrontFacingCamera();
+        cameraNumber = settings.getCameraNumber();
+        final int camera = getCamera(cameraNumber);
 
-        if (frontFacingCamera < 0) {
-            Log.w(TAG, "No front facing camera found!");
+        if (camera < 0) {
+            Log.w(TAG, "No front requested camera found!");
             return;
         }
-        cameraOrientation = getCameraOrientation(frontFacingCamera);
+        cameraOrientation = getCameraOrientation(camera);
         cameraHandler.post(new Runnable() {
             @Override
             public void run() {
-                openCameraAsync(frontFacingCamera);
+                openCameraAsync(camera);
             }
         });
     }
@@ -402,17 +416,14 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
         persistSize();
     }
 
-    private int getFrontFacingCamera() {
+    private int getCamera(CameraNumber cameraNumber) {
         int n = Camera.getNumberOfCameras();
 
         for (int i = 0; i < n; i++) {
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                Log.v(TAG, "Front facing camera: " + i);
+            if (info.facing == cameraNumber.getNumber()) {
                 return i;
-            } else {
-                Log.v(TAG, "Back facing camera: " + i);
             }
         }
         return -1;
@@ -514,7 +525,7 @@ public class CameraOverlay extends AbstractScreenOverlay implements TextureView.
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Settings.SHOW_CAMERA.equals(key) || Settings.CAMERA_ALPHA.equals(key)) {
+        if (asList(Settings.CAMERA_ALPHA, Settings.SHOW_CAMERA, Settings.CAMERA_NR).contains(key)) {
             applySettings();
         }
     }

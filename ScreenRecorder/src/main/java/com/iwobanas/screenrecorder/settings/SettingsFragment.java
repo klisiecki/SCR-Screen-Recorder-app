@@ -8,22 +8,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceGroup;
+import android.preference.*;
 import android.support.v4.provider.DocumentFile;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.iwobanas.screenrecorder.DirectoryChooserActivity;
-import com.iwobanas.screenrecorder.GusherDialogFragment;
-import com.iwobanas.screenrecorder.R;
-import com.iwobanas.screenrecorder.RecorderService;
-import com.iwobanas.screenrecorder.Utils;
+import com.iwobanas.screenrecorder.*;
 import com.iwobanas.screenrecorder.audio.AudioDriver;
 import com.iwobanas.screenrecorder.audio.AudioWarningDialogFragment;
 import com.iwobanas.screenrecorder.audio.InstallationStatus;
@@ -56,6 +46,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public static final String KEY_OTHER = "other";
     public static final String KEY_SHOW_CAMERA = "show_camera";
     public static final String KEY_CAMERA_ALPHA = "camera_alpha";
+    public static final String KEY_CAMERA_NUMBER = "camera_number";
     public static final String KEY_HIDE_ICON = "hide_icon";
     public static final String KEY_SHOW_TOUCHES = "show_touches";
     public static final String KEY_DOCUMENT_DIR = "document_dir";
@@ -87,6 +78,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private PreferenceCategory otherCategory;
     private SliderPreference cameraAlphaPreference;
     private CheckBoxPreference showCameraPreference;
+    private ListPreference cameraNumberPreference;
     private CheckBoxPreference hideIconPreference;
     private CheckBoxPreference showTouchesPreference;
     private Preference documentDirPreference;
@@ -167,6 +159,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         cameraAlphaPreference = (SliderPreference) findPreference(KEY_CAMERA_ALPHA);
         cameraAlphaPreference.setOnPreferenceChangeListener(this);
+
+        cameraNumberPreference = (ListPreference) findPreference(KEY_CAMERA_NUMBER);
+        cameraNumberPreference.setOnPreferenceChangeListener(this);
 
         hideIconPreference = (CheckBoxPreference) findPreference(KEY_HIDE_ICON);
         hideIconPreference.setOnPreferenceChangeListener(this);
@@ -258,6 +253,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         showCameraPreference.setChecked(settings.getShowCamera());
         cameraAlphaPreference.setValue((int) (settings.getCameraAlpha() * 100));
         cameraAlphaPreference.setSummary(formatCameraAlphaSummary());
+        cameraNumberPreference.setValue(settings.getCameraNumber().name());
+
         documentDirPreference.setSummary(settings.getDocumentDirName());
         outputDirPreference.setSummary(settings.getOutputDir().getAbsolutePath());
         stopOnScreenOffPreference.setChecked(settings.getStopOnScreenOff());
@@ -890,6 +887,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         } else if (preference == cameraAlphaPreference) {
             settings.setCameraAlpha(((Integer) newValue) / 100.0f);
             cameraAlphaPreference.setSummary(formatCameraAlphaSummary());
+        } else if (preference == cameraNumberPreference) {
+            settings.setCameraNumber(CameraNumber.valueOf(valueString));
         } else if (preference == stopOnScreenOffPreference) {
             settings.setStopOnScreenOff(selected);
         } else if (preference == colorFixPreference) {

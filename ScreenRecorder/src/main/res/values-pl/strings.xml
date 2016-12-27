@@ -327,7 +327,7 @@ Niestety aktualnie Lollipop nie pozwala na nagrywanie wyjścia audio bez root'a 
 
     <string name="can_not_start_toast">"Nie można rozpocząć nagrywania: %1$s"</string>
 
-    <string name="settings_show_camera">"Face Cam"</string>
+    <string name="settings_show_camera">"Kamera"</string>
     <string name="settings_show_camera_summary">"Obraz z kamery na pierwszym planie"</string>
     <string name="settings_camera_alpha_title">"Przezroczystość"</string>
     <string name="settings_camera_alpha_summary">"Przednia kamera widoczna w %1$d %%"</string>

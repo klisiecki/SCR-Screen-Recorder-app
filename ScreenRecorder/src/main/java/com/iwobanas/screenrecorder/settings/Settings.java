@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-
 import com.iwobanas.screenrecorder.BuildConfig;
 import com.iwobanas.screenrecorder.R;
 import com.iwobanas.screenrecorder.Utils;
@@ -51,6 +50,7 @@ public class Settings {
     public static final String AUDIO_SOURCE = "AUDIO_SOURCE";
     public static final String SHOW_CAMERA = "SHOW_CAMERA";
     public static final String CAMERA_ALPHA = "CAMERA_ALPHA";
+    public static final String CAMERA_NR = "CAMERA_NR";
     public static final String ROOT_ENABLED = "ROOT_ENABLED";
 
     private static Settings instance;
@@ -80,6 +80,7 @@ public class Settings {
     private boolean showTouches = false;
     private boolean showCamera = false;
     private float cameraAlpha = 1.0f;
+    private CameraNumber cameraNumber = CameraNumber.BACK;
     private boolean stopOnScreenOff = true;
     private int videoEncoder = VideoEncoder.H264;
     private int defaultVideoEncoder = VideoEncoder.H264;
@@ -541,6 +542,15 @@ public class Settings {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putFloat(CAMERA_ALPHA, cameraAlpha);
         settingsModified(editor);
+    }
+
+    public CameraNumber getCameraNumber() {
+        return cameraNumber;
+    }
+
+    public void setCameraNumber(CameraNumber number) {
+        this.cameraNumber = number;
+        settingsModified(preferences.edit().putString(CAMERA_NR, number.name()));
     }
 
     public boolean getStopOnScreenOff() {
