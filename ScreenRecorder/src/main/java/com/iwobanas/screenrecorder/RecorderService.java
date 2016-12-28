@@ -3,11 +3,7 @@ package com.iwobanas.screenrecorder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,13 +11,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings.Secure;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.ExceptionParser;
 import com.google.analytics.tracking.android.ExceptionReporter;
@@ -39,17 +35,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.iwobanas.screenrecorder.Tracker.ACTION;
-import static com.iwobanas.screenrecorder.Tracker.AUDIO;
-import static com.iwobanas.screenrecorder.Tracker.RECORDING;
-import static com.iwobanas.screenrecorder.Tracker.SETTINGS;
-import static com.iwobanas.screenrecorder.Tracker.SIZE;
-import static com.iwobanas.screenrecorder.Tracker.START;
-import static com.iwobanas.screenrecorder.Tracker.STATS;
-import static com.iwobanas.screenrecorder.Tracker.STOP;
-import static com.iwobanas.screenrecorder.Tracker.STOP_DESTROY;
-import static com.iwobanas.screenrecorder.Tracker.STOP_ICON;
-import static com.iwobanas.screenrecorder.Tracker.TIME;
+import static com.iwobanas.screenrecorder.Tracker.*;
 
 public class RecorderService extends Service implements IRecorderService, AudioDriver.OnInstallListener, IRecordingProcess.RecordingProcessObserver {
 
@@ -91,6 +77,8 @@ public class RecorderService extends Service implements IRecorderService, AudioD
     private IRecordingProcess projectionThreadRunner;
     private AudioDriver audioDriver;
     private ErrorDialogHelper errorDialogHelper;
+    private boolean logGPX = true; //TODO move to settings
+    private GPXLogger gpxLogger;
     private Handler handler;
     private RecorderServiceState state = RecorderServiceState.INITIALIZING;
     private boolean startOnReady;
@@ -114,6 +102,7 @@ public class RecorderService extends Service implements IRecorderService, AudioD
         handler = new Handler();
 
         errorDialogHelper = new ErrorDialogHelper(this);
+        gpxLogger = new GPXLogger(this);
         Settings.initialize(this);
         Settings s = Settings.getInstance();
 
@@ -204,12 +193,17 @@ public class RecorderService extends Service implements IRecorderService, AudioD
             screenOffReceiver.register();
         }
         audioDriver.startRecording();
-        if (useProjection()) {
-            projectionThreadRunner.start(getOutputFile(), getRotation());
-        } else {
-            nativeProcessRunner.start(getOutputFile(), getRotation());
-        }
         recordingStartTime = System.currentTimeMillis();
+        File outputFile = getOutputFile(recordingStartTime);
+        if (useProjection()) {
+            projectionThreadRunner.start(outputFile, getRotation());
+        } else {
+            nativeProcessRunner.start(outputFile, getRotation());
+        }
+
+        if (logGPX) {
+            gpxLogger.init(getGPXOutputFile(recordingStartTime));
+        }
 
         EasyTracker.getTracker().sendEvent(ACTION, START, START, null);
         EasyTracker.getTracker().sendEvent(SETTINGS, AUDIO, Settings.getInstance().getAudioSource().name(), null);
@@ -223,7 +217,16 @@ public class RecorderService extends Service implements IRecorderService, AudioD
         }
     }
 
-    private File getOutputFile() {
+    private File getOutputFile(long time) {
+        return getOutputFile(R.string.file_name_format, time);
+    }
+
+    private File getGPXOutputFile(long time) {
+        return getOutputFile(R.string.gpx_file_name_format, time);
+    }
+
+    @NonNull
+    private File getOutputFile(int file_name_format, long time) {
         //TODO: check external storage state
         File dir = Settings.getInstance().getOutputDir();
         if (!dir.exists()) {
@@ -239,8 +242,8 @@ public class RecorderService extends Service implements IRecorderService, AudioD
                 }
             }
         }
-        SimpleDateFormat format = new SimpleDateFormat(getString(R.string.file_name_format));
-        return new File(dir, format.format(new Date()));
+        SimpleDateFormat format = new SimpleDateFormat(getString(file_name_format));
+        return new File(dir, format.format(new Date(time)));
     }
 
     private String getRotation() {
@@ -267,6 +270,9 @@ public class RecorderService extends Service implements IRecorderService, AudioD
     @Override
     public void stopRecording() {
         setState(RecorderServiceState.STOPPING);
+        if (logGPX) {
+            gpxLogger.saveFile();
+        }
         if (useProjection()) {
             projectionThreadRunner.stop();
         } else {
