@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:support-v4:25.1.0'
     compile files('libs/libGoogleAnalyticsV2.jar')
 }
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '22.0.1'
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 15
