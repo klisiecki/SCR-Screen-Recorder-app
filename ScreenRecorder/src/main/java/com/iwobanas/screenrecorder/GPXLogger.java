@@ -21,10 +21,10 @@ import static android.location.LocationManager.GPS_PROVIDER;
 
 public class GPXLogger implements LocationListener {
 
-    private static final int GPS_DEFAULT_MIN_TIME = 1000;
+    private static final int GPS_DEFAULT_MIN_TIME = 500;
     private static final int MIN_GPS_METERS = 0;
 
-    public static final String TAG = "GPXLogger";
+    public static final String TAG = "scr_GPXLogger";
 
     private final Context context;
     private final List<Location> locations;
@@ -63,9 +63,12 @@ public class GPXLogger implements LocationListener {
         String name = "<name>gpx</name><trkseg>\n";
 
         String segments = "";
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
         for (Location l : points) {
-            segments += "<trkpt lat=\"" + l.getLatitude() + "\" lon=\"" + l.getLongitude() + "\"><time>" + df.format(new Date(l.getTime())) + "</time></trkpt>\n";
+            segments += "<trkpt lat=\"" + l.getLatitude() + "\" lon=\"" + l.getLongitude() + "\">" +
+                    "<time>" + df.format(new Date(l.getTime())) + "</time>" +
+                    "<speed>" + l.getSpeed() + "</speed>" +
+                    "</trkpt>\n";
         }
 
         String footer = "</trkseg></trk></gpx>";
@@ -87,16 +90,16 @@ public class GPXLogger implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        Log.d(TAG, "onStatusChanged " + provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
+        Log.d(TAG, "onProviderEnabled " + provider);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        Log.d(TAG, "onProviderDisabled " + provider);
     }
 }
