@@ -31,21 +31,20 @@ android {
     }
 
     signingConfigs {
-
-        release {
-            storeFile file("../../../.android/iwo-banas-release-key.keystore")
-            storePassword System.console() == null ? "IDE build" : new String(System.console().readPassword("\n\$ Enter store password: "))
-            keyAlias "iwo-banas-release"
-            keyPassword System.console() == null ? "IDE build" : new String(System.console().readPassword("\n\$ Enter key password: "))
-        }
+//        release {
+//            storeFile file("../../../.android/iwo-banas-release-key.keystore")
+//            storePassword System.console() == null ? "IDE build" : new String(System.console().readPassword("\n\$ Enter store password: "))
+//            keyAlias "iwo-banas-release"
+//            keyPassword System.console() == null ? "IDE build" : new String(System.console().readPassword("\n\$ Enter key password: "))
+//        }
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
+//        release {
+//            signingConfig signingConfigs.release
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+//        }
     }
 
     useLibrary 'org.apache.http.legacy'
