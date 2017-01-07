@@ -6,12 +6,12 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
     }
 
     productFlavors {
@@ -22,7 +22,7 @@ android {
         noRoot {
             applicationId "com.iwobanas.screenrecorder.noroot.pro"
             minSdkVersion 21
-            targetSdkVersion 22
+            targetSdkVersion 25
         }
     }
 
