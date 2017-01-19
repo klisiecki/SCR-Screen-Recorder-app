@@ -18,10 +18,10 @@ import java.util.List;
 
 public class RecorderActivity extends Activity {
 
-    public final static int REQUEST_CODE = -1010101;
+    private final static int REQUEST_CODE = -1010101;
     private final static String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.RECORD_AUDIO};
+            Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA};
 
     /**
      * Called when the activity is first created.
