@@ -238,6 +238,12 @@ Niestety aktualnie Lollipop nie pozwala na nagrywanie wyjścia audio bez root'a 
     <string name="settings_mic_gain_summary">"Zwiększ głośność o %1$ddB"</string>
 
     <string name="settings_other_category">"Inne"</string>
+    <string name="settings_log_gpx">Loguj GPX</string>
+    <string name="settings_log_gpx_summary">Logownie pozycji podczas nagrywania</string>
+    <string name="settings_split_recordings">Dziel nagrania</string>
+    <string name="settings_split_recordings_summary">Nowy plik wideo co 15 minut nagrania</string>
+    <string name="settings_choose_camera">Wybierz kamerę</string>
+    <string name="settings_choose_camera_summary">Przednia lub tylna kamera</string>
     <string name="settings_hide_icon">"Ukryj ikonę"</string>
     <string name="settings_show_touches">"Pokaż dotknięcia"</string>
     <string name="settings_show_touches_summary">"Wskaźniki dotknięć możesz też włączyć na stałe poprzez wybranie ustawienia systemu Android: Ustawienia → Opcje programistyczne → Pokaż dotknięcia"</string>

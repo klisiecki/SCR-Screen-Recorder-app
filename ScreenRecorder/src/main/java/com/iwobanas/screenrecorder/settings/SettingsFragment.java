@@ -44,6 +44,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public static final String KEY_STEREO = "stereo";
     public static final String KEY_MIC_GAIN = "mic_gain";
     public static final String KEY_OTHER = "other";
+    public static final String KEY_LOG_GPX = "log_gpx";
+    public static final String KEY_SPLIT_RECORDINGS= "split_recordings";
     public static final String KEY_SHOW_CAMERA = "show_camera";
     public static final String KEY_CAMERA_ALPHA = "camera_alpha";
     public static final String KEY_CAMERA_NUMBER = "camera_number";
@@ -76,6 +78,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private CheckBoxPreference stereoPreference;
     private SliderPreference micGainPreference;
     private PreferenceCategory otherCategory;
+    private CheckBoxPreference logGpxPreference;
+    private CheckBoxPreference splitRecordingsPreference;
     private SliderPreference cameraAlphaPreference;
     private CheckBoxPreference showCameraPreference;
     private ListPreference cameraNumberPreference;
@@ -154,6 +158,12 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         micGainPreference.setOnPreferenceChangeListener(this);
 
         otherCategory = (PreferenceCategory) findPreference(KEY_OTHER);
+        logGpxPreference = (CheckBoxPreference) findPreference(KEY_LOG_GPX);
+        logGpxPreference.setOnPreferenceChangeListener(this);
+
+        splitRecordingsPreference = (CheckBoxPreference) findPreference(KEY_SPLIT_RECORDINGS);
+        splitRecordingsPreference.setOnPreferenceChangeListener(this);
+
         showCameraPreference = (CheckBoxPreference) findPreference(KEY_SHOW_CAMERA);
         showCameraPreference.setOnPreferenceChangeListener(this);
 
@@ -248,6 +258,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         micGainPreference.setSummary(formatMicGain());
         micGainPreference.setEnabled(settings.getTimeLapse() == 1 && settings.getAudioSource() == AudioSource.MIX);
 
+        logGpxPreference.setChecked(settings.getLogGpx());
+        splitRecordingsPreference.setChecked(settings.getSplitRecordings());
         hideIconPreference.setChecked(settings.getHideIcon());
         showTouchesPreference.setChecked(settings.getShowTouches());
         showCameraPreference.setChecked(settings.getShowCamera());
@@ -882,6 +894,10 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             settings.setHideIcon(selected);
         } else if (preference == showTouchesPreference) {
             settings.setShowTouches(selected);
+        } else if (preference == logGpxPreference) {
+            settings.setLogGpx(selected);
+        } else if (preference == splitRecordingsPreference) {
+            settings.setSplitRecordings(selected);
         } else if (preference == showCameraPreference) {
             settings.setShowCamera(selected);
         } else if (preference == cameraAlphaPreference) {

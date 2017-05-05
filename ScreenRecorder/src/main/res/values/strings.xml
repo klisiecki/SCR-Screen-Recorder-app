@@ -416,4 +416,8 @@ If you decide to uninstall %1$s in the future open SCR Settings and disable inte
     <string name="settings_gusher_title">Gusher</string>
     <string name="settings_gusher_summary">Broadcast live to Twitch, YouTube or other streaming service</string>
     <string name="settings_mp4fix_summary">Simply repair recordings corrupted by camera crash or dead battery</string>
+    <string name="settings_log_gpx">Log GPX</string>
+    <string name="settings_log_gpx_summary">Log positions during recording</string>
+    <string name="settings_split_recordings">Split recordings</string>
+    <string name="settings_split_recordings_summary">Create new video every 15 minutes</string>
 </resources>

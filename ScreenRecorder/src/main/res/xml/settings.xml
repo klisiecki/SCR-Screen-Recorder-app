@@ -106,6 +106,16 @@
 
     <PreferenceCategory android:key="other" android:title="@string/settings_other_category">
         <CheckBoxPreference
+            android:key="log_gpx"
+            android:persistent="false"
+            android:summary="@string/settings_log_gpx_summary"
+            android:title="@string/settings_log_gpx" />
+        <CheckBoxPreference
+            android:key="split_recordings"
+            android:persistent="false"
+            android:summary="@string/settings_split_recordings_summary"
+            android:title="@string/settings_split_recordings" />
+        <CheckBoxPreference
             android:key="show_camera"
             android:persistent="false"
             android:summary="@string/settings_show_camera_summary"

@@ -77,7 +77,7 @@ public class RecorderService extends Service implements IRecorderService, AudioD
     private IRecordingProcess projectionThreadRunner;
     private AudioDriver audioDriver;
     private ErrorDialogHelper errorDialogHelper;
-    private boolean logGPX = true; //TODO move to settings
+    private boolean logGPX = true;
     private GPXLogger gpxLogger;
     private Handler handler;
     private RecorderServiceState state = RecorderServiceState.INITIALIZING;
@@ -201,8 +201,24 @@ public class RecorderService extends Service implements IRecorderService, AudioD
             nativeProcessRunner.start(outputFile, getRotation());
         }
 
+        logGPX = Settings.getInstance().getLogGpx();
         if (logGPX) {
             gpxLogger.init(getGPXOutputFile(recordingStartTime));
+        }
+
+        final long maxRecordingLength = Settings.getInstance().getSplitRecordings() ? 60000 * 15 : -1;
+        if (maxRecordingLength > 0) {
+            Log.d(TAG, "Split recordings enabled");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (nextFile()) {
+                        handler.postDelayed(this, maxRecordingLength);
+                    }
+                }
+            }, maxRecordingLength);
+        } else {
+            Log.d(TAG, "Split recordings disabled");
         }
 
         EasyTracker.getTracker().sendEvent(ACTION, START, START, null);
@@ -215,6 +231,22 @@ public class RecorderService extends Service implements IRecorderService, AudioD
         } else {
             startOnReady = true;
         }
+    }
+
+    public boolean nextFile() {
+        if (useProjection()) {
+            if (state == RecorderServiceState.RECORDING) {
+                Log.d(TAG, "Creating another file");
+                projectionThreadRunner.stop();
+                recordingStartTime = System.currentTimeMillis();
+                File outputFile = getOutputFile(recordingStartTime);
+                projectionThreadRunner.start(outputFile, getRotation());
+                return true;
+            } else {
+                Log.d(TAG, "Not creating another file: state = " + state);
+            }
+        }
+        return false;
     }
 
     private File getOutputFile(long time) {

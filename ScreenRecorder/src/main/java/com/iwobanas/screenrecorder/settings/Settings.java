@@ -31,6 +31,8 @@ public class Settings {
     private static final String COLOR_FIX = "COLOR_FIX";
     private static final String HIDE_ICON = "HIDE_ICON";
     private static final String SHOW_TOUCHES = "SHOW_TOUCHES";
+    private static final String LOG_GPX = "LOG_GPX";
+    private static final String SPLIT_RECORDINGS = "SPLIT_RECORDINGS";
     private static final String STOP_ON_SCREEN_OFF = "STOP_ON_SCREEN_OFF";
     private static final String OUTPUT_DIR = "OUTPUT_DIR";
     private static final String OUTPUT_DIR_WRITABLE = "OUTPUT_DIR_WRITABLE";
@@ -78,6 +80,8 @@ public class Settings {
     private boolean defaultColorFix = false;
     private boolean hideIcon = false;
     private boolean showTouches = false;
+    private boolean logGpx = true;
+    private boolean splitRecordings = false;
     private boolean showCamera = false;
     private float cameraAlpha = 1.0f;
     private CameraNumber cameraNumber = CameraNumber.BACK;
@@ -194,6 +198,9 @@ public class Settings {
         hideIcon = preferences.getBoolean(HIDE_ICON, false);
 
         showTouches = preferences.getBoolean(SHOW_TOUCHES, false);
+
+        logGpx = preferences.getBoolean(LOG_GPX, true);
+        splitRecordings = preferences.getBoolean(SPLIT_RECORDINGS, false);
 
         showCamera = preferences.getBoolean(SHOW_CAMERA, false);
         cameraAlpha = preferences.getFloat(CAMERA_ALPHA, 1.0f);
@@ -522,6 +529,28 @@ public class Settings {
         settingsModified(preferences.edit().putBoolean(SHOW_TOUCHES, showTouches));
     }
 
+    public void setLogGpx(boolean logGpx) {
+        this.logGpx = logGpx;
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(LOG_GPX, logGpx);
+        settingsModified(editor);
+    }
+
+    public boolean getLogGpx() {
+        return logGpx;
+    }
+
+    public void setSplitRecordings(boolean splitRecordings) {
+        this.splitRecordings = splitRecordings;
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(SPLIT_RECORDINGS, splitRecordings);
+        settingsModified(editor);
+    }
+
+    public boolean getSplitRecordings() {
+        return splitRecordings;
+    }
+
     public boolean getShowCamera() {
         return showCamera;
     }
@@ -675,6 +704,12 @@ public class Settings {
             showTouches = false;
         }
         editor.remove(SHOW_TOUCHES);
+
+        logGpx = true;
+        editor.remove(LOG_GPX);
+
+        splitRecordings = false;
+        editor.remove(SPLIT_RECORDINGS);
 
         showCamera = false;
         editor.remove(SHOW_CAMERA);
