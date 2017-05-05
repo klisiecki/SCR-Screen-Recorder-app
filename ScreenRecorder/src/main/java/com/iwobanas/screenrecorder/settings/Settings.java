@@ -81,7 +81,7 @@ public class Settings {
     private boolean hideIcon = false;
     private boolean showTouches = false;
     private boolean logGpx = true;
-    private boolean splitRecordings = false;
+    private boolean splitRecordings = true;
     private boolean showCamera = false;
     private float cameraAlpha = 1.0f;
     private CameraNumber cameraNumber = CameraNumber.BACK;
@@ -200,7 +200,7 @@ public class Settings {
         showTouches = preferences.getBoolean(SHOW_TOUCHES, false);
 
         logGpx = preferences.getBoolean(LOG_GPX, true);
-        splitRecordings = preferences.getBoolean(SPLIT_RECORDINGS, false);
+        splitRecordings = preferences.getBoolean(SPLIT_RECORDINGS, true);
 
         showCamera = preferences.getBoolean(SHOW_CAMERA, false);
         cameraAlpha = preferences.getFloat(CAMERA_ALPHA, 1.0f);
