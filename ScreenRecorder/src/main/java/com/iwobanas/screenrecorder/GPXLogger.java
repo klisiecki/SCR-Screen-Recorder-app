@@ -38,16 +38,28 @@ public class GPXLogger implements LocationListener {
         Log.d(TAG, this.getClass().getSimpleName() + " created");
     }
 
-    public void init(File outputFile) {
+    public void initLogging(File outputFile) {
         locationManager.requestLocationUpdates(GPS_PROVIDER, GPS_DEFAULT_MIN_TIME, MIN_GPS_METERS, this);
+        initFile(outputFile);
+    }
+
+    private void initFile(File outputFile) {
         locations.clear();
         this.outputFile = outputFile;
         Log.d(TAG, this.getClass().getSimpleName() + " initialized");
-
     }
 
-    public void saveFile() {
+    public void nextFile(File outputFile) {
+        writeLocationsAndCloseFile();
+        initFile(outputFile);
+    }
+
+    public void stopLogging() {
         locationManager.removeUpdates(this);
+        writeLocationsAndCloseFile();
+    }
+
+    private void writeLocationsAndCloseFile() {
         writeLocations(outputFile, locations);
         Log.d(TAG, "saved GPX file to " + outputFile.getName());
     }

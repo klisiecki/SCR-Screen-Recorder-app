@@ -203,7 +203,7 @@ public class RecorderService extends Service implements IRecorderService, AudioD
 
         logGPX = Settings.getInstance().getLogGpx();
         if (logGPX) {
-            gpxLogger.init(getGPXOutputFile(recordingStartTime));
+            gpxLogger.initLogging(getGPXOutputFile(recordingStartTime));
         }
 
         final long maxRecordingLength = Settings.getInstance().getSplitRecordings() ? 60000 * 15 : -1;
@@ -239,6 +239,9 @@ public class RecorderService extends Service implements IRecorderService, AudioD
                 Log.d(TAG, "Creating another file");
                 projectionThreadRunner.stop();
                 recordingStartTime = System.currentTimeMillis();
+                if (logGPX) {
+                    gpxLogger.nextFile(getGPXOutputFile(recordingStartTime));
+                }
                 File outputFile = getOutputFile(recordingStartTime);
                 projectionThreadRunner.start(outputFile, getRotation());
                 return true;
@@ -303,7 +306,7 @@ public class RecorderService extends Service implements IRecorderService, AudioD
     public void stopRecording() {
         setState(RecorderServiceState.STOPPING);
         if (logGPX) {
-            gpxLogger.saveFile();
+            gpxLogger.stopLogging();
         }
         if (useProjection()) {
             projectionThreadRunner.stop();
