@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import static android.location.LocationManager.GPS_PROVIDER;
+import static java.util.Collections.synchronizedList;
 
 public class GPXLogger implements LocationListener {
 
@@ -33,7 +34,7 @@ public class GPXLogger implements LocationListener {
 
     public GPXLogger(Context context) {
         this.context = context;
-        this.locations = new ArrayList<>();
+        this.locations = synchronizedList(new ArrayList<Location>());
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Log.d(TAG, this.getClass().getSimpleName() + " created");
     }
@@ -102,7 +103,7 @@ public class GPXLogger implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d(TAG, "onStatusChanged " + provider);
+        Log.d(TAG, "onStatusChanged " + provider + ", status = " + status);
     }
 
     @Override

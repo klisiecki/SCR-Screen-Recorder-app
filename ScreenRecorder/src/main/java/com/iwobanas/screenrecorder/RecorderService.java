@@ -240,7 +240,12 @@ public class RecorderService extends Service implements IRecorderService, AudioD
                 projectionThreadRunner.stop();
                 recordingStartTime = System.currentTimeMillis();
                 if (logGPX) {
-                    gpxLogger.nextFile(getGPXOutputFile(recordingStartTime));
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            gpxLogger.nextFile(getGPXOutputFile(recordingStartTime));
+                        }
+                    }.start();
                 }
                 File outputFile = getOutputFile(recordingStartTime);
                 projectionThreadRunner.start(outputFile, getRotation());
